@@ -6,28 +6,21 @@ module decoder
 	input 		[291:0] decode_i,
 	
 	output 	reg [358:0] decode_o,
-	output 	reg [64:0] 	jal_id_if_o
-);
 	
-	localparam riscv_pkg_XLEN = 64;
-	localparam riscv_pkg_INST_SIZE = 32;
-	localparam drac_pkg_REGFILE_WIDTH = 5;
+	// Changed from jal_id_if_o
+	output 	reg [64:0] 	jal_o
+);
 
 	wire [63:0] imm_value;
 	
-	reg xcpt_illegal_instruction_int;
-	reg xcpt_addr_misaligned_int;
+	reg 		xcpt_illegal_instruction_int;
+	reg 		xcpt_addr_misaligned_int;
 	
 	immediate immediate_inst
 	(
 		.instr_i 	(decode_i[`instruction_msb:`instruction_lsb]),
 		.imm_o		(imm_value)
 	);
-	
-	function automatic [4:0] sv2v_cast_5;
-		input reg [4:0] inp;
-		sv2v_cast_5 = inp;
-	endfunction
 	
 	always @(*) 
 		begin
@@ -65,8 +58,8 @@ module decoder
 			decode_o[`decode_o_stall_csr_fence_bit] 										= 1'b0;
 		
 			
-			jal_id_if_o[64] 				= 1'b0;
-			jal_id_if_o[63-:riscv_pkg_XLEN] = 64'b0;
+			jal_o[`jal_o_valid_bit] 														= 1'b0;
+			jal_o[`jal_o_jump_address_msb:`jal_o_jump_address_lsb] 							= 64'b0;
 			
 		
 		
@@ -97,10 +90,10 @@ module decoder
 						decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd20;
 						decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd3;
 						
-						xcpt_addr_misaligned_int 		= |imm_value[1:0];
+						xcpt_addr_misaligned_int 												= |imm_value[1:0];
 						
-						jal_id_if_o[64] 				= !xcpt_addr_misaligned_int & decode_i[`valid_bit];
-						jal_id_if_o[63-:riscv_pkg_XLEN] = imm_value + decode_i[`pc_msb:`pc_lsb];
+						jal_o[`jal_o_valid_bit] 												= !xcpt_addr_misaligned_int & decode_i[`valid_bit];
+						jal_o[`jal_o_jump_address_msb:`jal_o_jump_address_lsb] 					= imm_value + decode_i[`pc_msb:`pc_lsb];
 					end
 					
 				`jalr_type 		:
@@ -125,12 +118,12 @@ module decoder
 						decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd3;
 						
 						case (decode_i[`funct3_msb:`funct3_lsb])
-							3'b000 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd17;
-							3'b001 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd18;
-							3'b100 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd13;
-							3'b101 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd15;
-							3'b110 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd14;
-							3'b111 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd16;
+							`funct3_beq 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd17;
+							`funct3_bne 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd18;
+							`funct3_blt 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd13;
+							`funct3_bge 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd15;
+							`funct3_bltu 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd14;
+							`funct3_bgeu 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd16;
 							
 							default : xcpt_illegal_instruction_int = 1'b1;
 						endcase
@@ -143,13 +136,13 @@ module decoder
 						decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd4;
 						
 						case (decode_i[`funct3_msb:`funct3_lsb])
-							3'b000	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd50;
-							3'b001	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd47;
-							3'b010	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd44;
-							3'b011	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd42;
-							3'b100	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd52;
-							3'b101	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd48;
-							3'b110 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd45;
+							`funct3_lb	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd50;
+							`funct3_lh	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd47;
+							`funct3_lw	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd44;
+							`funct3_ld	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd42;
+							`funct3_lbu	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd52;
+							`funct3_lhu	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd48;
+							`funct3_lwu : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd45;
 							
 							default : xcpt_illegal_instruction_int 	= 1'b1;
 						endcase
@@ -162,10 +155,10 @@ module decoder
 						decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd4;
 					
 						case (decode_i[`funct3_msb:`funct3_lsb])
-							3'b000	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd51;
-							3'b001	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd49;
-							3'b010	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd46;
-							3'b011 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd43;
+							`funct3_sb	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd51;
+							`funct3_sh	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd49;
+							`funct3_sw	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd46;
+							`funct3_sd 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd43;
 							
 							default : xcpt_illegal_instruction_int 	= 1'b1;
 						endcase
@@ -178,46 +171,46 @@ module decoder
 						decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd4;
 					
 						case (decode_i[`funct3_msb:`funct3_lsb])
-							3'b010 	:
+							`funct3_amo32 	:
 								case (decode_i[`funct5_msb:`funct5_lsb])
-									5'b00010 :
+									`funct5_lr_d 		:
 										if (decode_i[`rs2_msb:`rs2_lsb] != 5'b0)
 											xcpt_illegal_instruction_int 											= 1'b1;
 										else
 											decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd53;
 											
-									5'b00011 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd55;
-									5'b00001 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd57;
-									5'b00000 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd58;
-									5'b00100 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd61;
-									5'b01100 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd59;
-									5'b01000 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd60;
-									5'b10000 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd64;
-									5'b10100 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd62;
-									5'b11000 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd65;
-									5'b11100 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd63;
+									`funct5_sc_d 		: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd55;
+									`funct5_amoswap_d 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd57;
+									`funct5_amoadd_d 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd58;
+									`funct5_amoxor_d 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd61;
+									`funct5_amoand_d 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd59;
+									`funct5_amoor_d 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd60;
+									`funct5_amomin_d 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd64;
+									`funct5_amomax_d 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd62;
+									`funct5_amominu_d 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd65;
+									`funct5_amomaxu_d 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd63;
 									
 									default 	: xcpt_illegal_instruction_int 	= 1'b1;
 								endcase
 								
-							3'b011 	:
+							`funct3_amo64 	:
 								case (decode_i[`funct5_msb:`funct5_lsb])
-									5'b00010:
+									`funct5_lr_w 		:
 										if (decode_i[`rs2_msb:`rs2_lsb] != 'h0)
 											xcpt_illegal_instruction_int 												= 1'b1;
 										else
 											decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] 	= 7'd54;
 											
-									5'b00011	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd56;
-									5'b00001	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd66;
-									5'b00000	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd67;
-									5'b00100	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd70;
-									5'b01100	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd68;
-									5'b01000	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd69;
-									5'b10000	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd73;
-									5'b10100	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd71;
-									5'b11000	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd74;
-									5'b11100 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd72;
+									`funct5_sc_w		: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd56;
+									`funct5_amoswap_w	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd66;
+									`funct5_amoadd_w	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd67;
+									`funct5_amoxor_w	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd70;
+									`funct5_amoand_w	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd68;
+									`funct5_amoor_w		: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd69;
+									`funct5_amomin_w	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd73;
+									`funct5_amomax_w	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd71;
+									`funct5_amominu_w	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd74;
+									`funct5_amomaxu_w 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd72;
 									
 									default 	: xcpt_illegal_instruction_int 	= 1'b1;
 								endcase
@@ -233,14 +226,14 @@ module decoder
 						decode_o[`decode_o_sirf_write_enable] = 1'b1;
 						
 						case (decode_i[`funct3_msb:`funct3_lsb])
-							3'b000 : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd0;
-							3'b010 : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd21;
-							3'b011 : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd22;
-							3'b100 : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd4;
-							3'b110 : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd5;
-							3'b111 : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd6;
+							`funct3_addi : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd0;
+							`funct3_slti : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd21;
+							`funct3_sltiu : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd22;
+							`funct3_xori : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd4;
+							`funct3_ori : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd5;
+							`funct3_andi : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd6;
 							
-							3'b001 :
+							`funct3_slli :
 								begin
 								decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd9;
 								
@@ -250,7 +243,7 @@ module decoder
 										xcpt_illegal_instruction_int = 1'b0;
 								end
 							
-							3'b101 :
+							`funct3_srai :
 								case (decode_i[`funct7_msb:`funct7_lsb] >> 1)
 									7'b0100000 >> 1: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd7;
 									7'b0000000 >> 1: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd8;
@@ -265,62 +258,62 @@ module decoder
 						decode_o[`decode_o_sirf_write_enable] = 1'b1;
 					
 						case ({decode_i[`funct7_msb:`funct7_lsb], decode_i[`funct3_msb:`funct3_lsb]})
-							10'b0000000000 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd0;
-							10'b0100000000 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd1;
-							10'b0000000001 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd9;
-							10'b0000000010 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd21;
-							10'b0000000011 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd22;
-							10'b0000000100 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd4;
-							10'b0000000101 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd8;
-							10'b0100000101 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd7;
-							10'b0000000110 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd5;
-							10'b0000000111 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd6;
+							{`funct7_common, `funct3_add_sub} 		: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd0;
+							{`funct7_srai_sub_sra, `funct3_add_sub} : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd1;
+							{`funct7_common, `funct3_sll} 			: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd9;
+							{`funct7_common, `funct3_slt} 			: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd21;
+							{`funct7_common, `funct3_sltu} 			: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd22;
+							{`funct7_common, `funct3_xor} 			: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd4;
+							{`funct7_common, `funct3_srl_sra} 		: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd8;
+							{`funct7_sari_sub_sra, `funct3_srl_sra} : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd7;
+							{`funct7_common, `funct3_or} 			: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd5;
+							{`funct7_common, `funct3_and} 			: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd6;
 							
-							10'b0000001000 	:
+							{`funct7_mul_div, `funct3_mul} 	:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd75;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd2;
 								end
 								
-							10'b0000001001 	:
+							{`funct7_mul_div, `funct3_mulh} 		:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd76;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd2;
 								end
 								
-							10'b0000001010 	:
+							{`funct7_mul_div, `funct3_mulhsu} 		:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd78;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd2;
 								end
 								
-							10'b0000001011 	:
+							{`funct7_mul_div, `funct3_mulhu} 		:
 								begin
-								decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] 	= 7'd77;
-								decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 		= 3'd2;
+									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd77;
+									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd2;
 								end
 								
-							10'b0000001100 	:
+							{`funct7_mul_div, `funct3_div} 			:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd80;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd1;
 									decode_o[`decode_o_signed_operation_bit] = 1'b1;
 								end
 								
-							10'b0000001101 	:
+							{`funct7_mul_div, `funct3_divu} 		:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd81;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd1;
 								end
 								
-							10'b0000001110 	:
+							{`funct7_mul_div, `funct3_rem} 			:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd84;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd1;
 									decode_o[`decode_o_signed_operation_bit] = 1'b1;
 								end
 								
-							10'b0000001111 	:
+							{`funct7_mul_div, `funct3_remu} 		:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd85;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd1;
@@ -337,9 +330,9 @@ module decoder
 						decode_o[`decode_o_op_32_bit] = 1'b1;
 						
 						case (decode_i[`funct3_msb:`funct3_lsb])
-							3'b000 : decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd2;
+							`funct3_addiw 		: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd2;
 							
-							3'b001 :
+							`funct3_slliw 		:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd11;
 								
@@ -349,10 +342,10 @@ module decoder
 										xcpt_illegal_instruction_int = 1'b0;
 								end
 								
-							3'b101:
+							`funct3_srliw_sraiw :
 								case (decode_i[`funct7_msb:`funct7_lsb])
-									7'b0100000	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd12;
-									7'b0000000 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd10;
+									`funct7_sraiw_subw_sraw	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd12;
+									`funct7_common 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd10;
 									
 									default 	: xcpt_illegal_instruction_int = 1'b1;
 								endcase
@@ -367,39 +360,39 @@ module decoder
 						decode_o[`decode_o_op_32_bit] = 1'b1;
 						
 						case ({decode_i[`funct7_msb:`funct7_lsb], decode_i[`funct3_msb:`funct3_lsb]})
-							10'b0000000000 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd2;
-							10'b0100000000 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd3;
-							10'b0000000001 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd11;
-							10'b0000000101 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd10;
-							10'b0100000101 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd12;
+							{`funct7_common, 		`funct3_addw_subw} 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd2;
+							{`funct7_srai_sub_sra, 	`funct3_addw_subw} 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd3;
+							{`funct7_common, 		`funct3_sllw} 		: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd11;
+							{`funct7_common, 		`funct3_srlw_sraw} 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd10;
+							{`funct7_srai_sub_sra, 	`funct3_addw_subw} 	: decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd12;
 							
-							10'b0000001000 	:
+							{`funct7_mul_div, 		`funct3_mulw} 		:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd79;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd2;
 								end
 								
-							10'b0000001100 	:
+							{`funct7_mul_div, 		`funct3_divw} 		:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd82;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd1;
 									decode_o[`decode_o_signed_operation_bit] = 1'b1;
 								end
 								
-							10'b0000001101 	:
+							{`funct7_mul_div, 		`funct3_divuw} 		:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd83;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd1;
 								end
 							
-							10'b0000001110 	:
+							{`funct7_mul_div, 		`funct3_remw} 		:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd86;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd1;
 									decode_o[`decode_o_signed_operation_bit] = 1'b1;
 								end
 								
-							10'b0000001111 	:
+							{`funct7_mul_div, 		`funct3_remuw} 		:
 								begin
 									decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd87;
 									decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd1;
@@ -411,13 +404,13 @@ module decoder
 					
 				`fence_type 	:
 					case (decode_i[`funct3_msb:`funct3_lsb])
-						3'b000 :
+						`funct3_fence 	:
 							begin
 								decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd29;
 								decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
 							end
 							
-						3'b001 :
+						`funct3_fence_i :
 							begin
 								decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd30;
 								decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
@@ -433,7 +426,7 @@ module decoder
 						decode_o[`decode_o_functional_unit_msb:`decode_o_functional_unit_lsb] 	= 3'd6;
 						
 					case (decode_i[`funct3_msb:`funct3_lsb])
-						3'b000 	:
+						`funct3_ecall_ebreak_eret 	:
 							begin
 								decode_o[`decode_o_sirf_write_enable] = 1'b0;
 								
@@ -442,25 +435,25 @@ module decoder
 								
 							else
 								case (decode_i[`funct7_msb:`funct7_lsb])
-									7'b0000000 :
+									`funct7_ecall_ebreak_uret 		:
 										if (decode_i[`rs1_msb:`rs1_lsb] != 'h0)
 											xcpt_illegal_instruction_int = 1'b1;
 											
 										else
 											case (decode_i[`rs2_msb:`rs2_lsb])
-												5'b00000 	:
+												`rs2_ecall_eret 		:
 													begin
 														decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd26;
 														decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
 													end
 													
-												5'b00001 	:
+												`rs2_ebreak_sfencevm :
 													begin
 														decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd27;
 														decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
 													end
 													
-												5'b00010 	:
+												`rs2_uret_sret_mret 	:
 													begin
 														decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd25;
 														decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
@@ -469,25 +462,25 @@ module decoder
 												default		: xcpt_illegal_instruction_int 	= 1'b1;
 											endcase
 											
-									7'b0001000 :
+									`funct7_sret_wfi_eret_sfence 	:
 										if (decode_i[`rs1_msb:`rs1_lsb] != 5'b0)
 											xcpt_illegal_instruction_int = 1'b1;
 											
 										else
 											case (decode_i[`rs2_msb:`rs2_lsb])
-												5'b00010 	:
+												`rs2_uret_sret_mret 	:
 													begin
 														decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd24;
 														decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
 													end
 													
-												5'b00101 	:
+												`rs2_wfi 			:
 													begin
 														decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd28;
 														decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
 													end
 													
-												5'b00001 	:
+												`rs2_ebreak_sfencevm :
 													begin
 														decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd31;
 														decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
@@ -496,13 +489,13 @@ module decoder
 												default 	: xcpt_illegal_instruction_int 	= 1'b1;
 											endcase
 											
-									7'b0011000 :
+									`sfence_vm 						:
 										if (decode_i[`rs1_msb:`rs1_lsb] != 'h0)
 											xcpt_illegal_instruction_int = 1'b1;
 											
 										else
 											case (decode_i[`rs2_msb:`rs2_lsb])
-												5'b00010 	:
+												`rs2_uret_sret_mret :
 													begin
 														decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd23;
 														decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
@@ -511,7 +504,7 @@ module decoder
 												default 	: xcpt_illegal_instruction_int = 1'b1;
 											endcase
 											
-									7'b0001001 :
+									`mret_mrts 						:
 										begin
 											decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd31;
 											decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
@@ -521,37 +514,37 @@ module decoder
 								endcase
 							end
 							
-						3'b001 	:
+						`funct3_csrrw 				:
 							begin
 								decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd36;
 								decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
 							end
 							
-						3'b010 	:
+						`funct3_csrrs 				:
 							begin
 								decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd37;
 								decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
 							end
 							
-						3'b011 	:
+						`funct3_csrrc 				:
 							begin
 								decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd38;
 								decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
 							end
 							
-						3'b101 	:
+						`funct3_csrrwi 				:
 							begin
 								decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd39;
 								decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
 							end
 							
-						3'b110 	:
+						`funct3_csrrsi 				:
 							begin
 								decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd40;
 								decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
 							end
 							
-						3'b111 	:
+						`funct3_csrrci 				:
 							begin
 								decode_o[`decode_o_instruction_type_msb:`decode_o_instruction_type_lsb] = 7'd41;
 								decode_o[`decode_o_stall_csr_fence_bit] 								= 1'b1;
@@ -564,32 +557,31 @@ module decoder
 				default: xcpt_illegal_instruction_int = 1'b1;
 			endcase
 		end
-		
-	function automatic [63:0] sv2v_cast_93998;
-		input reg [63:0] inp;
-		sv2v_cast_93998 = inp;
-	endfunction
 	
 	always @ (*)
 		if (!decode_i[`valid_exception_bit])
 			if (xcpt_addr_misaligned_int)
 				begin
 					decode_o[`decode_o_exception_valid_bit] 								= 1'b1;
-					decode_o[`decode_o_exception_cause_msb:`decode_o_exception_cause_lsb] 	= sv2v_cast_93998(64'b0);
-					decode_o[`decode_o_exception_origin_msb:`decode_o_exception_origin_lsb] = jal_id_if_o[63-:riscv_pkg_XLEN];
+					
+					// Deleted the sv2v_cast_93998 function invocation (What is it for anyway?)
+					decode_o[`decode_o_exception_cause_msb:`decode_o_exception_cause_lsb] 	= 64'b0;
+					decode_o[`decode_o_exception_origin_msb:`decode_o_exception_origin_lsb] = jal_o[`jal_o_jump_address_msb:`jal_o_jump_address_lsb];
 				end
 				
 			else if (xcpt_illegal_instruction_int)
 				begin
 					decode_o[`decode_o_exception_valid_bit] 								= 1'b1;
-					decode_o[`decode_o_exception_cause_msb:`decode_o_exception_cause_lsb] 	= sv2v_cast_93998(64'h0000000000000002);
+					
+					// Trimmed large 64'hxx...xx declarations to the minimum
+					decode_o[`decode_o_exception_cause_msb:`decode_o_exception_cause_lsb] 	= 64'h2;
 					decode_o[`decode_o_exception_origin_msb:`decode_o_exception_origin_lsb] = 'h0;
 				end
 					
 			else 
 				begin
-					decode_o[`decode_o_exception_valid_bit] 								= 'h0;
-					decode_o[`decode_o_exception_cause_msb:`decode_o_exception_cause_lsb] 	= sv2v_cast_93998(64'h00000000000000ff);
+					decode_o[`decode_o_exception_valid_bit] 								= 1'b0;
+					decode_o[`decode_o_exception_cause_msb:`decode_o_exception_cause_lsb] 	= 64'hff;
 					decode_o[`decode_o_exception_origin_msb:`decode_o_exception_origin_lsb] = 'h0;
 				end
 		else

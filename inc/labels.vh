@@ -104,3 +104,8 @@
 `define decode_o_memory_size_lsb 		1
 
 `define decode_o_stall_csr_fence_bit 	0
+
+// JAL-Related Labels
+`define jal_o_valid_bit 				64
+`define jal_o_jump_address_msb 			63
+`define jal_o_jump_address_lsb 			0
