@@ -1,0 +1,5 @@
+includes/*.bak
+tb/*.bak
+rtl/scalar/fpga/*.bak
+rtl/scalar/rtl/*.bak
+rtl/scalar/tb/*.bak

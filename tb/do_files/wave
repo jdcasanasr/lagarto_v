@@ -1,0 +1,59 @@
+onerror {resume}
+quietly WaveActivateNextPane {} 0
+add wave -noupdate /vector_datapath_tb/clk
+add wave -noupdate -group {ctrl sgnl} /vector_datapath_tb/rst
+add wave -noupdate -group {ctrl sgnl} /vector_datapath_tb/flush
+add wave -noupdate -group {ctrl sgnl} /vector_datapath_tb/load
+add wave -noupdate -group {datapath input} /vector_datapath_tb/f3
+add wave -noupdate -group {datapath input} /vector_datapath_tb/instruction
+add wave -noupdate -group {datapath input} /vector_datapath_tb/vsew
+add wave -noupdate -group {datapath input} /vector_datapath_tb/vs1R
+add wave -noupdate -group {datapath input} /vector_datapath_tb/vs2R
+add wave -noupdate -group {datapath input} /vector_datapath_tb/vdR
+add wave -noupdate -group {tb signals} /vector_datapath_tb/we_tb
+add wave -noupdate -group {tb signals} /vector_datapath_tb/re_tb
+add wave -noupdate -group {tb signals} -radix hexadecimal -radixshowbase 0 /vector_datapath_tb/tb_i_vs1R_high
+add wave -noupdate -group {tb signals} -radix hexadecimal -radixshowbase 0 /vector_datapath_tb/tb_i_vs1R_low
+add wave -noupdate -group {tb signals} -radix hexadecimal -radixshowbase 0 /vector_datapath_tb/tb_i_vs2R_high
+add wave -noupdate -group {tb signals} -radix hexadecimal -radixshowbase 0 /vector_datapath_tb/tb_i_vs2R_low
+add wave -noupdate -group {tb signals} -radix hexadecimal -radixshowbase 0 /vector_datapath_tb/Result_high
+add wave -noupdate -group {tb signals} -radix hexadecimal -radixshowbase 0 /vector_datapath_tb/Result_low
+add wave -noupdate -group {tb signals} -radix hexadecimal -radixshowbase 0 /vector_datapath_tb/tb_vs1R_high
+add wave -noupdate -group {tb signals} -radix hexadecimal -radixshowbase 0 /vector_datapath_tb/tb_vs1R_low
+add wave -noupdate -group {tb signals} -radix hexadecimal -radixshowbase 0 /vector_datapath_tb/tb_vs2R_high
+add wave -noupdate -group {tb signals} -radix hexadecimal -radixshowbase 0 /vector_datapath_tb/tb_vs2R_low
+add wave -noupdate -group {tb signals} -radix unsigned -radixshowbase 0 /vector_datapath_tb/x
+add wave -noupdate -group {tb fifo} /vector_datapath_tb/SaveData1/fifomem
+add wave -noupdate -group {tb fifo} /vector_datapath_tb/SaveData2/fifomem
+add wave -noupdate -group Vdecode /vector_datapath_tb/DUT/vector_lagarto/if_vid_instruction_o
+add wave -noupdate -group Vdecode /vector_datapath_tb/DUT/vector_lagarto/vid_system_vector_o
+add wave -noupdate -group Vdecode /vector_datapath_tb/DUT/vector_lagarto/vid_resource_vector_o
+add wave -noupdate -group Vdecode /vector_datapath_tb/DUT/vector_lagarto/vid_register_vector_o
+add wave -noupdate -group Vdecode /vector_datapath_tb/DUT/vector_lagarto/vid_operation_vector_o
+add wave -noupdate -group VregRead /vector_datapath_tb/DUT/vector_lagarto/vrr_vmask_read_data_o
+add wave -noupdate -group VregRead /vector_datapath_tb/DUT/vector_lagarto/vrr_vs1_read_data_o
+add wave -noupdate -group VregRead /vector_datapath_tb/DUT/vector_lagarto/vrr_vs2_read_data_o
+add wave -noupdate -group VregRead /vector_datapath_tb/DUT/vector_lagarto/vrr_rs1_read_data_o
+add wave -noupdate -group VregRead /vector_datapath_tb/DUT/vector_lagarto/vrr_vd_read_data_o
+add wave -noupdate -group Vexe /vector_datapath_tb/DUT/vector_lagarto/vd_dataa_i
+add wave -noupdate -group Vexe /vector_datapath_tb/DUT/vector_lagarto/vd_fw_datab_o
+add wave -noupdate -group Vexe /vector_datapath_tb/DUT/vector_lagarto/vexe_vdata_o
+add wave -noupdate /vector_datapath_tb/DUT/vector_lagarto/vexe_vwb_vdata_o
+TreeUpdate [SetDefaultTree]
+WaveRestoreCursors {{Cursor 1} {309 ps} 0}
+quietly wave cursor active 1
+configure wave -namecolwidth 150
+configure wave -valuecolwidth 124
+configure wave -justifyvalue left
+configure wave -signalnamewidth 1
+configure wave -snapdistance 10
+configure wave -datasetprefix 0
+configure wave -rowmargin 4
+configure wave -childrowmargin 2
+configure wave -gridoffset 0
+configure wave -gridperiod 1
+configure wave -griddelta 40
+configure wave -timeline 0
+configure wave -timelineunits ps
+update
+WaveRestoreZoom {0 ps} {102 ps}

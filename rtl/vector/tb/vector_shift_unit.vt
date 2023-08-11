@@ -1,0 +1,206 @@
+module vector_shift_unit_tb();
+
+reg				chip_enable_i_r;
+reg	[1:0]		shift_type_i_r;
+reg	[2:0]		vsew_i_r;
+reg	[127:0]	vs1_i_r;
+reg	[127:0]	vs2_i_r;
+reg	[127:0]	prube;
+               
+wire	[127:0]	vd_o_r;
+
+initial
+	begin
+		chip_enable_i_r	=	'b1;
+		shift_type_i_r		=	'b0;
+		vsew_i_r				=	'b0;
+		vs1_i_r				=	'b0;
+		vs2_i_r				=	'b0;
+		prube					=	'b0;
+	end
+	
+always
+	begin
+	#1
+		chip_enable_i_r	= {$random}	% 2;
+		shift_type_i_r		= {$random}	% 4;
+		vsew_i_r				= {$random}	% 4;
+		vs1_i_r				= {$random,$random,$random,$random};
+		vs2_i_r				= {$random,$random,$random,$random};
+	end
+
+always
+	begin
+	#1
+		if(chip_enable_i_r)
+			begin
+			case(shift_type_i_r)
+				2'b01:
+					case(vsew_i_r)
+						3'b000:
+							begin
+								prube[7:0] 			<=	vs1_i_r[7:0]		<<		vs2_i_r[2:0];
+								prube[15:8]			<=	vs1_i_r[15:8]		<<		vs2_i_r[10:8];
+								prube[23:16]		<=	vs1_i_r[23:16]		<<		vs2_i_r[18:16];
+								prube[31:24]		<=	vs1_i_r[31:24]		<<		vs2_i_r[26:24];
+								prube[39:32]		<=	vs1_i_r[39:32]		<<		vs2_i_r[34:32];
+								prube[47:40]		<=	vs1_i_r[47:40]		<<		vs2_i_r[42:40];
+								prube[55:48]		<=	vs1_i_r[55:48]		<<		vs2_i_r[50:48];
+								prube[63:56]		<=	vs1_i_r[63:56]		<<		vs2_i_r[58:56];
+								prube[71:64]		<=	vs1_i_r[71:64]		<<		vs2_i_r[66:64];
+								prube[79:72]		<=	vs1_i_r[79:72]		<<		vs2_i_r[74:72];
+								prube[87:80]		<=	vs1_i_r[87:80]		<<		vs2_i_r[82:80];
+								prube[95:88]		<=	vs1_i_r[95:88]		<<		vs2_i_r[90:88];
+								prube[103:96]		<=	vs1_i_r[103:96]	<<		vs2_i_r[98:96];
+								prube[111:104]		<=	vs1_i_r[111:104]	<<		vs2_i_r[106:104];
+								prube[119:112]		<=	vs1_i_r[119:112]	<<		vs2_i_r[114:112];
+								prube[127:120]		<=	vs1_i_r[127:120]	<<		vs2_i_r[122:120];
+							end
+						3'b001:
+							begin
+								prube[15:0] 		<=	vs1_i_r[15:0]		<<		vs2_i_r[3:0];
+								prube[31:16]		<=	vs1_i_r[31:16]		<<		vs2_i_r[19:16];
+								prube[47:32]		<=	vs1_i_r[47:32]		<<		vs2_i_r[35:32];
+								prube[63:48]		<=	vs1_i_r[63:48]		<<		vs2_i_r[51:48];
+								prube[79:64]		<=	vs1_i_r[79:64]		<<		vs2_i_r[67:64];
+								prube[95:80]		<=	vs1_i_r[95:80]		<<		vs2_i_r[83:80];
+								prube[111:96]		<=	vs1_i_r[111:96]	<<		vs2_i_r[99:96];
+								prube[127:112]		<=	vs1_i_r[127:112]	<<		vs2_i_r[115:112];
+							end
+						3'b010:
+							begin
+								prube[31:0] 		<=	vs1_i_r[31:0] 		<<		vs2_i_r[4:0];
+								prube[63:32]		<=	vs1_i_r[63:32]		<<		vs2_i_r[36:32];
+								prube[95:64]		<=	vs1_i_r[95:64]		<<		vs2_i_r[69:64];
+								prube[127:96]		<=	vs1_i_r[127:96]	<<		vs2_i_r[100:96];
+							end
+						3'b011:
+							begin
+								prube[63:0] 		<=	vs1_i_r[63:0] 		<<		vs2_i_r[5:0];
+								prube[127:64]		<=	vs1_i_r[127:64]	<<		vs2_i_r[69:64];
+							end
+						default:
+								prube <= 'b0;
+					endcase
+				2'b10:
+					case(vsew_i_r)
+						3'b000:
+							begin
+								prube[7:0] 			<=	vs1_i_r[7:0]		>>		vs2_i_r[2:0];
+								prube[15:8]			<=	vs1_i_r[15:8]		>>		vs2_i_r[10:8];
+								prube[23:16]		<=	vs1_i_r[23:16]		>>		vs2_i_r[18:16];
+								prube[31:24]		<=	vs1_i_r[31:24]		>>		vs2_i_r[26:24];
+								prube[39:32]		<=	vs1_i_r[39:32]		>>		vs2_i_r[34:32];
+								prube[47:40]		<=	vs1_i_r[47:40]		>>		vs2_i_r[42:40];
+								prube[55:48]		<=	vs1_i_r[55:48]		>>		vs2_i_r[50:48];
+								prube[63:56]		<=	vs1_i_r[63:56]		>>		vs2_i_r[58:56];
+								prube[71:64]		<=	vs1_i_r[71:64]		>>		vs2_i_r[66:64];
+								prube[79:72]		<=	vs1_i_r[79:72]		>>		vs2_i_r[74:72];
+								prube[87:80]		<=	vs1_i_r[87:80]		>>		vs2_i_r[82:80];
+								prube[95:88]		<=	vs1_i_r[95:88]		>>		vs2_i_r[90:88];
+								prube[103:96]		<=	vs1_i_r[103:96]	>>		vs2_i_r[98:96];
+								prube[111:104]	<=	vs1_i_r[111:104]		>>		vs2_i_r[106:104];
+								prube[119:112]	<=	vs1_i_r[119:112]		>>		vs2_i_r[114:112];
+								prube[127:120]	<=	vs1_i_r[127:120]		>>		vs2_i_r[122:120];
+							end
+						3'b001:
+							begin
+								prube[15:0] 		<=	vs1_i_r[15:0]		>>		vs2_i_r[3:0];
+								prube[31:16]		<=	vs1_i_r[31:16]		>>		vs2_i_r[19:16];
+								prube[47:32]		<=	vs1_i_r[47:32]		>>		vs2_i_r[35:32];
+								prube[63:48]		<=	vs1_i_r[63:48]		>>		vs2_i_r[51:48];
+								prube[79:64]		<=	vs1_i_r[79:64]		>>		vs2_i_r[67:64];
+								prube[95:80]		<=	vs1_i_r[95:80]		>>		vs2_i_r[83:80];
+								prube[111:96]		<=	vs1_i_r[111:96]	>>		vs2_i_r[99:96];
+								prube[127:112]		<=	vs1_i_r[127:112]	>>		vs2_i_r[115:112];
+							end
+						3'b010:
+							begin
+								prube[31:0] 		<=	vs1_i_r[31:0] 		>>		vs2_i_r[4:0];
+								prube[63:32]		<=	vs1_i_r[63:32]		>>		vs2_i_r[36:32];
+								prube[95:64]		<=	vs1_i_r[95:64]		>>		vs2_i_r[68:64];
+								prube[127:96]		<=	vs1_i_r[127:96]	>>		vs2_i_r[100:96];
+							end
+						3'b011:
+							begin
+								prube[63:0] 		<=	vs1_i_r[63:0] 		>>		vs2_i_r[5:0];
+								prube[127:64]		<=	vs1_i_r[127:64]	>>		vs2_i_r[69:64];
+							end
+						default:
+								prube <= 'b0;
+					endcase
+				2'b11:
+					case(vsew_i_r)
+						3'b000:
+							begin
+								prube[7:0] 		<=	vs1_i_r[7:0]			>>>		vs2_i_r[2:0];
+								prube[15:8]		<=	vs1_i_r[15:8]			>>>		vs2_i_r[10:8];
+								prube[23:16]		<=	vs1_i_r[23:16]		>>>		vs2_i_r[18:16];
+								prube[31:24]		<=	vs1_i_r[31:24]		>>>		vs2_i_r[26:24];
+								prube[39:32]		<=	vs1_i_r[39:32]		>>>		vs2_i_r[34:32];
+								prube[47:40]		<=	vs1_i_r[47:40]		>>>		vs2_i_r[42:40];
+								prube[55:48]		<=	vs1_i_r[55:48]		>>>		vs2_i_r[50:48];
+								prube[63:56]		<=	vs1_i_r[63:56]		>>>		vs2_i_r[58:56];
+								prube[71:64]		<=	vs1_i_r[71:64]		>>>		vs2_i_r[66:64];
+								prube[79:72]		<=	vs1_i_r[79:72]		>>>		vs2_i_r[74:72];
+								prube[87:80]		<=	vs1_i_r[87:80]		>>>		vs2_i_r[82:80];
+								prube[95:88]		<=	vs1_i_r[95:88]		>>>		vs2_i_r[90:88];
+								prube[103:96]		<=	vs1_i_r[103:96]	>>>		vs2_i_r[98:96];
+								prube[111:104]	<=	vs1_i_r[111:104]		>>>		vs2_i_r[106:104];
+								prube[119:112]	<=	vs1_i_r[119:112]		>>>		vs2_i_r[114:112];
+								prube[127:120]	<=	vs1_i_r[127:120]		>>>		vs2_i_r[122:120];
+							end
+						3'b001:
+							begin
+								prube[15:0] 		<=	vs1_i_r[15:0]		>>>		vs2_i_r[3:0];
+								prube[31:16]		<=	vs1_i_r[31:16]		>>>		vs2_i_r[19:16];
+								prube[47:32]		<=	vs1_i_r[47:32]		>>>		vs2_i_r[35:32];
+								prube[63:48]		<=	vs1_i_r[63:48]		>>>		vs2_i_r[51:48];
+								prube[79:64]		<=	vs1_i_r[79:64]		>>>		vs2_i_r[67:64];
+								prube[95:80]		<=	vs1_i_r[95:80]		>>>		vs2_i_r[83:80];
+								prube[111:96]		<=	vs1_i_r[111:96]	>>>		vs2_i_r[99:96];
+								prube[127:112]		<=	vs1_i_r[127:112]	>>>		vs2_i_r[115:112];
+							end
+						3'b010:
+							begin
+								prube[31:0] 		<=	vs1_i_r[31:0] 		>>>		vs2_i_r[4:0];
+								prube[63:32]		<=	vs1_i_r[63:32]		>>>		vs2_i_r[36:32];
+								prube[95:64]		<=	vs1_i_r[95:64]		>>>		vs2_i_r[68:64];
+								prube[127:96]		<=	vs1_i_r[127:96]	>>>		vs2_i_r[100:96];
+							end
+						3'b011:
+							begin
+								prube[63:0] 		<=	vs1_i_r[63:0] 		>>>		vs2_i_r[5:0];
+								prube[127:64]		<=	vs1_i_r[127:64]	>>>		vs2_i_r[69:64];
+							end
+						default:
+								prube <= 'b0;
+					endcase
+				default:
+						prube <= 'b0;
+			endcase
+			end
+		else
+			begin
+			prube <= 'b0;
+			end
+	end
+	
+always
+	begin
+		#1
+		if(vd_o_r == prube)
+			$display("OK");
+		else
+			$display("ERROR");
+	end
+vector_shift_unit dut(
+	.chip_enable_i			(chip_enable_i_r),
+	.shift_type_i			(shift_type_i_r),
+	.vsew_i					(vsew_i_r),
+	.vs1_i					(vs1_i_r),
+	.vs2_i					(vs2_i_r),
+	.vd_o						(vd_o_r) 
+);
+
+endmodule

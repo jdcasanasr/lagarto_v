@@ -1,0 +1,93 @@
+`include "header_files/riscv_vector.vh"
+`include "test_files/vector_register_file.vh"
+
+// Define Several register_read_vector_i_r Use Cases
+`define register_read_vector_i 
+
+module vector_register_file_tb ();
+
+localparam VRF_WIDTH 			= 128;
+localparam VRF_DEPTH 			= 32;
+localparam VRF_ADDRESS_WIDTH 	= $clog2(VRF_DEPTH);
+
+reg 									clk_i;
+	
+reg 	[VRF_ADDRESS_WIDTH - 1:0] 		vs1_read_address_i_r;
+reg 	[VRF_ADDRESS_WIDTH - 1:0] 		vs2_read_address_i_r;
+reg 	[VRF_ADDRESS_WIDTH - 1:0] 		vd_read_address_i_r;
+		
+reg 	[VRF_ADDRESS_WIDTH - 1:0] 		vd_write_address_i_r;
+reg 	[VRF_WIDTH - 1:0] 				vd_write_data_i_r;
+
+reg 	[`REGISTER_VECTOR_WIDTH - 1:0] 	register_vector_i_r;
+
+wire 	[VRF_WIDTH - 1:0]				vmask_read_data_o_w;
+wire 	[VRF_WIDTH - 1:0]				vs1_read_data_o_w;
+wire 	[VRF_WIDTH - 1:0]				vs2_read_data_o_w;
+wire 	[VRF_WIDTH - 1:0]				vd_read_data_o_w;
+
+initial
+	begin
+		clk_i 					<= 1'b1;
+		
+		vs1_read_address_i_r 	<= '0;
+		vs2_read_address_i_r 	<= '0;
+		vd_read_address_i_r 	<= '0;
+		
+		register_vector_i_r 	<= '0;
+		
+		vd_write_address_i_r 	<= '0;
+		vd_write_data_i_r 		<= '0;
+	end
+
+
+always
+	#10 clk_i <= ~clk_i;
+	
+always
+	begin
+		// Test Reads
+		#20	begin
+		vs1_read_address_i_r		=	{$random} %32;
+		vs2_read_address_i_r		=	{$random} %32;
+		vd_read_address_i_r 		=	{$random} %32;
+		vd_write_address_i_r		=	{$random} %32;
+		vd_write_data_i_r 			=	{$random,$random,$random,$random};
+		register_vector_i_r[6:3]	=	{$random} %16;
+		end
+		#20	if	(register_vector_i_r[3])
+		begin
+			#1	vs1_read_address_i_r		=	vd_write_address_i_r;
+			#1	register_vector_i_r[6:3]	=	4'b1000;
+			#1	if(vs1_read_data_o_w		==	vd_write_data_i_r)
+				$display("write data successfull");
+				else
+				$display("ERROR");
+		end
+		#20;
+	end
+vector_register_file
+#(
+	.VRF_WIDTH 			(VRF_WIDTH),
+	.VRF_DEPTH 			(VRF_DEPTH),
+	.VRF_ADDRESS_WIDTH 	(VRF_ADDRESS_WIDTH)
+)	dut	(
+	.clk_i 				(clk_i),
+	
+	.vs1_read_address_i (vs1_read_address_i_r),
+	.vs2_read_address_i (vs2_read_address_i_r),
+	.vd_read_address_i 	(vd_read_address_i_r),
+	
+	.vd_write_address_i (vd_write_address_i_r),
+	.vd_write_data_i 	(vd_write_data_i_r),
+	
+	.register_vector_i 	(register_vector_i_r),
+
+	
+	.vmask_read_data_o 	(vmask_read_data_o_w),
+	.vs1_read_data_o 	(vs1_read_data_o_w),
+	.vs2_read_data_o 	(vs2_read_data_o_w),
+	.vd_read_data_o 	(vd_read_data_o_w)
+);
+
+endmodule

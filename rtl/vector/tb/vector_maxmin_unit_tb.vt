@@ -1,0 +1,259 @@
+module vector_maxmin_unit_tb();
+
+	reg					chip_enable_i_r;
+	reg					signed_unsigned_i_r;
+	reg					maxmin_type_i_r;
+	reg 				x;
+	reg		[2:0]		vsew_i_r;
+	reg		[127:0]		vs1_i_r;
+	reg		[127:0]		vs2_i_r;
+	reg		[127:0]		probe;
+	wire	[127:0]		vd_o_r;
+	
+	initial
+		begin
+			chip_enable_i_r		=	'b0;
+			signed_unsigned_i_r =	'b0;
+			maxmin_type_i_r		=	'b0;
+			vsew_i_r			=	'b0;
+			vs1_i_r				=	'b0;
+			probe				=	'b0;
+			vs2_i_r				=	'b0;
+			x					=	'b0;
+			
+		end
+		
+	always
+		begin
+		#1
+			chip_enable_i_r		= {$random}	% 2;
+			signed_unsigned_i_r = {$random}	% 2;
+			maxmin_type_i_r		= {$random}	% 2;
+			vsew_i_r			= {$random}	% 4;
+			vs1_i_r				= {$random,$random,$random,$random};
+			vs2_i_r				= {$random,$random,$random,$random};
+		end
+		
+	always
+		begin
+		#1
+			if(chip_enable_i_r)
+				if(!signed_unsigned_i_r)
+					if(maxmin_type_i_r)
+						case(vsew_i_r)
+							3'b000:
+							begin
+								probe[7:0]     = (($signed(vs1_i_r[7:0])     > $signed(vs2_i_r[7:0]))     ? vs1_i_r[7:0]     : vs2_i_r[7:0]);
+								probe[15:8]    = (($signed(vs1_i_r[15:8])    > $signed(vs2_i_r[15:8]))    ? vs1_i_r[15:8]    : vs2_i_r[15:8]);
+								probe[23:16]   = (($signed(vs1_i_r[23:16])   > $signed(vs2_i_r[23:16]))   ? vs1_i_r[23:16]   : vs2_i_r[23:16]);
+								probe[31:24]   = (($signed(vs1_i_r[31:24])   > $signed(vs2_i_r[31:24]))   ? vs1_i_r[31:24]   : vs2_i_r[31:24]);
+								probe[39:32]   = (($signed(vs1_i_r[39:32])   > $signed(vs2_i_r[39:32]))   ? vs1_i_r[39:32]   : vs2_i_r[39:32]);
+								probe[47:40]   = (($signed(vs1_i_r[47:40])   > $signed(vs2_i_r[47:40]))   ? vs1_i_r[47:40]   : vs2_i_r[47:40]);
+								probe[55:48]   = (($signed(vs1_i_r[55:48])   > $signed(vs2_i_r[55:48]))   ? vs1_i_r[55:48]   : vs2_i_r[55:48]);
+								probe[63:56]   = (($signed(vs1_i_r[63:56])   > $signed(vs2_i_r[63:56]))   ? vs1_i_r[63:56]   : vs2_i_r[63:56]);
+								probe[71:64]   = (($signed(vs1_i_r[71:64])   > $signed(vs2_i_r[71:64]))   ? vs1_i_r[71:64]   : vs2_i_r[71:64]);
+								probe[79:72]   = (($signed(vs1_i_r[79:72])   > $signed(vs2_i_r[79:72]))   ? vs1_i_r[79:72]   : vs2_i_r[79:72]);
+								probe[87:80]   = (($signed(vs1_i_r[87:80])   > $signed(vs2_i_r[87:80]))   ? vs1_i_r[87:80]   : vs2_i_r[87:80]);
+								probe[95:88]   = (($signed(vs1_i_r[95:88])   > $signed(vs2_i_r[95:88]))   ? vs1_i_r[95:88]   : vs2_i_r[95:88]);
+								probe[103:96]  = (($signed(vs1_i_r[103:96])  > $signed(vs2_i_r[103:96]))  ? vs1_i_r[103:96]  : vs2_i_r[103:96]);
+								probe[111:104] = (($signed(vs1_i_r[111:104]) > $signed(vs2_i_r[111:104])) ? vs1_i_r[111:104] : vs2_i_r[111:104]);
+								probe[119:112] = (($signed(vs1_i_r[119:112]) > $signed(vs2_i_r[119:112])) ? vs1_i_r[119:112] : vs2_i_r[119:112]);
+								probe[127:120] = (($signed(vs1_i_r[127:120]) > $signed(vs2_i_r[127:120])) ? vs1_i_r[127:120] : vs2_i_r[127:120]);
+							end
+							3'b001:
+							begin
+								probe[15:0]    = (($signed(vs1_i_r[15:0])    > $signed(vs2_i_r[15:0]  ))  ? vs1_i_r[15:0]   : vs2_i_r[15:0]);
+								probe[31:16]   = (($signed(vs1_i_r[31:16])   > $signed(vs2_i_r[31:16] ))  ? vs1_i_r[31:16]  : vs2_i_r[31:16]);
+								probe[47:32]   = (($signed(vs1_i_r[47:32])   > $signed(vs2_i_r[47:32] ))  ? vs1_i_r[47:32]  : vs2_i_r[47:32]);
+								probe[63:48]   = (($signed(vs1_i_r[63:48])   > $signed(vs2_i_r[63:48] ))  ? vs1_i_r[63:48]  : vs2_i_r[63:48]);
+								probe[79:64]   = (($signed(vs1_i_r[79:64])   > $signed(vs2_i_r[79:64] ))  ? vs1_i_r[79:64]  : vs2_i_r[79:64]);
+								probe[95:80]   = (($signed(vs1_i_r[95:80])   > $signed(vs2_i_r[95:80] ))  ? vs1_i_r[95:80]  : vs2_i_r[95:80]);
+								probe[111:96]  = (($signed(vs1_i_r[111:96])  > $signed(vs2_i_r[111:96]))  ? vs1_i_r[111:96] : vs2_i_r[111:96]);
+								probe[127:112] = (($signed(vs1_i_r[127:112]) > $signed(vs2_i_r[127:112])) ? vs1_i_r[127:112]: vs2_i_r[127:112]);
+							end
+							3'b010:
+							begin
+								probe[31:0]	   = (($signed(vs1_i_r[31:0]  ) > $signed(vs2_i_r[31:0]  )) ? vs1_i_r[31:0]   : vs2_i_r[31:0]);
+								probe[63:32]   = (($signed(vs1_i_r[63:32] ) > $signed(vs2_i_r[63:32] )) ? vs1_i_r[63:32]  : vs2_i_r[63:32]);
+								probe[95:64]   = (($signed(vs1_i_r[95:64] ) > $signed(vs2_i_r[95:64] )) ? vs1_i_r[95:64]  : vs2_i_r[95:64]);
+								probe[127:96]  = (($signed(vs1_i_r[127:96]) > $signed(vs2_i_r[127:96])) ? vs1_i_r[127:96] : vs2_i_r[127:96]);
+							end
+							3'b011:
+							begin
+								probe[63:0]    = (($signed(vs1_i_r[63:0] )  > $signed(vs2_i_r[63:0] ))  ? vs1_i_r[63:0]   : vs2_i_r[63:0]);
+								probe[127:64]  = (($signed(vs1_i_r[127:64]) > $signed(vs2_i_r[127:64])) ? vs1_i_r[127:64] : vs2_i_r[127:64]);
+							end
+							default:
+								probe = 'b0;
+						endcase
+					else
+						case(vsew_i_r)
+							3'b000:
+							begin
+								probe[7:0]     = (($signed(vs1_i_r[7:0]    ) < $signed(vs2_i_r[7:0]    )) ? vs1_i_r[7:0]     : vs2_i_r[7:0]);
+								probe[15:8]    = (($signed(vs1_i_r[15:8]   ) < $signed(vs2_i_r[15:8]   )) ? vs1_i_r[15:8]    : vs2_i_r[15:8]);
+								probe[23:16]   = (($signed(vs1_i_r[23:16]  ) < $signed(vs2_i_r[23:16]  )) ? vs1_i_r[23:16]   : vs2_i_r[23:16]);
+								probe[31:24]   = (($signed(vs1_i_r[31:24]  ) < $signed(vs2_i_r[31:24]  )) ? vs1_i_r[31:24]   : vs2_i_r[31:24]);
+								probe[39:32]   = (($signed(vs1_i_r[39:32]  ) < $signed(vs2_i_r[39:32]  )) ? vs1_i_r[39:32]   : vs2_i_r[39:32]);
+								probe[47:40]   = (($signed(vs1_i_r[47:40]  ) < $signed(vs2_i_r[47:40]  )) ? vs1_i_r[47:40]   : vs2_i_r[47:40]);
+								probe[55:48]   = (($signed(vs1_i_r[55:48]  ) < $signed(vs2_i_r[55:48]  )) ? vs1_i_r[55:48]   : vs2_i_r[55:48]);
+								probe[63:56]   = (($signed(vs1_i_r[63:56]  ) < $signed(vs2_i_r[63:56]  )) ? vs1_i_r[63:56]   : vs2_i_r[63:56]);
+								probe[71:64]   = (($signed(vs1_i_r[71:64]  ) < $signed(vs2_i_r[71:64]  )) ? vs1_i_r[71:64]   : vs2_i_r[71:64]);
+								probe[79:72]   = (($signed(vs1_i_r[79:72]  ) < $signed(vs2_i_r[79:72]  )) ? vs1_i_r[79:72]   : vs2_i_r[79:72]);
+								probe[87:80]   = (($signed(vs1_i_r[87:80]  ) < $signed(vs2_i_r[87:80]  )) ? vs1_i_r[87:80]   : vs2_i_r[87:80]);
+								probe[95:88]   = (($signed(vs1_i_r[95:88]  ) < $signed(vs2_i_r[95:88]  )) ? vs1_i_r[95:88]   : vs2_i_r[95:88]);
+								probe[103:96]  = (($signed(vs1_i_r[103:96] ) < $signed(vs2_i_r[103:96] )) ? vs1_i_r[103:96]  : vs2_i_r[103:96]);
+								probe[111:104] = (($signed(vs1_i_r[111:104]) < $signed(vs2_i_r[111:104])) ? vs1_i_r[111:104] : vs2_i_r[111:104]);
+								probe[119:112] = (($signed(vs1_i_r[119:112]) < $signed(vs2_i_r[119:112])) ? vs1_i_r[119:112] : vs2_i_r[119:112]);
+								probe[127:120] = (($signed(vs1_i_r[127:120]) < $signed(vs2_i_r[127:120])) ? vs1_i_r[127:120] : vs2_i_r[127:120]);
+							end
+							3'b001:
+							begin
+								probe[15:0]    = (($signed(vs1_i_r[15:0]   ) < $signed(vs2_i_r[15:0]  ))  ? vs1_i_r[15:0]   : vs2_i_r[15:0]);
+								probe[31:16]   = (($signed(vs1_i_r[31:16]  ) < $signed(vs2_i_r[31:16] ))  ? vs1_i_r[31:16]  : vs2_i_r[31:16]);
+								probe[47:32]   = (($signed(vs1_i_r[47:32]  ) < $signed(vs2_i_r[47:32] ))  ? vs1_i_r[47:32]  : vs2_i_r[47:32]);
+								probe[63:48]   = (($signed(vs1_i_r[63:48]  ) < $signed(vs2_i_r[63:48] ))  ? vs1_i_r[63:48]  : vs2_i_r[63:48]);
+								probe[79:64]   = (($signed(vs1_i_r[79:64]  ) < $signed(vs2_i_r[79:64] ))  ? vs1_i_r[79:64]  : vs2_i_r[79:64]);
+								probe[95:80]   = (($signed(vs1_i_r[95:80]  ) < $signed(vs2_i_r[95:80] ))  ? vs1_i_r[95:80]  : vs2_i_r[95:80]);
+								probe[111:96]  = (($signed(vs1_i_r[111:96] ) < $signed(vs2_i_r[111:96]))  ? vs1_i_r[111:96] : vs2_i_r[111:96]);
+								probe[127:112] = (($signed(vs1_i_r[127:112]) < $signed(vs2_i_r[127:112])) ? vs1_i_r[127:112]: vs2_i_r[127:112]);
+							end
+							3'b010:
+							begin
+								probe[31:0]	   = (($signed(vs1_i_r[31:0]  )  < $signed(vs2_i_r[31:0]  )) ? vs1_i_r[31:0]   : vs2_i_r[31:0]);
+								probe[63:32]   = (($signed(vs1_i_r[63:32] )  < $signed(vs2_i_r[63:32] )) ? vs1_i_r[63:32]  : vs2_i_r[63:32]);
+								probe[95:64]   = (($signed(vs1_i_r[95:64] )  < $signed(vs2_i_r[95:64] )) ? vs1_i_r[95:64]  : vs2_i_r[95:64]);
+								probe[127:96]  = (($signed(vs1_i_r[127:96])  < $signed(vs2_i_r[127:96])) ? vs1_i_r[127:96] : vs2_i_r[127:96]);
+							end
+							3'b011:
+							begin
+								probe[63:0]    = (($signed(vs1_i_r[63:0] )   < $signed(vs2_i_r[63:0] ))  ? vs1_i_r[63:0]   : vs2_i_r[63:0]);
+								probe[127:64]  = (($signed(vs1_i_r[127:64])  < $signed(vs2_i_r[127:64])) ? vs1_i_r[127:64] : vs2_i_r[127:64]);
+							end
+							default:
+								probe = 'b0;
+						endcase
+				else
+					if(maxmin_type_i_r)
+						case(vsew_i_r)
+							3'b000:
+							begin
+								probe[7:0]     = (($unsigned(vs1_i_r[7:0]    ) > $unsigned(vs2_i_r[7:0]    )) ? vs1_i_r[7:0]     : vs2_i_r[7:0]);
+								probe[15:8]    = (($unsigned(vs1_i_r[15:8]   ) > $unsigned(vs2_i_r[15:8]   )) ? vs1_i_r[15:8]    : vs2_i_r[15:8]);
+								probe[23:16]   = (($unsigned(vs1_i_r[23:16]  ) > $unsigned(vs2_i_r[23:16]  )) ? vs1_i_r[23:16]   : vs2_i_r[23:16]);
+								probe[31:24]   = (($unsigned(vs1_i_r[31:24]  ) > $unsigned(vs2_i_r[31:24]  )) ? vs1_i_r[31:24]   : vs2_i_r[31:24]);
+								probe[39:32]   = (($unsigned(vs1_i_r[39:32]  ) > $unsigned(vs2_i_r[39:32]  )) ? vs1_i_r[39:32]   : vs2_i_r[39:32]);
+								probe[47:40]   = (($unsigned(vs1_i_r[47:40]  ) > $unsigned(vs2_i_r[47:40]  )) ? vs1_i_r[47:40]   : vs2_i_r[47:40]);
+								probe[55:48]   = (($unsigned(vs1_i_r[55:48]  ) > $unsigned(vs2_i_r[55:48]  )) ? vs1_i_r[55:48]   : vs2_i_r[55:48]);
+								probe[63:56]   = (($unsigned(vs1_i_r[63:56]  ) > $unsigned(vs2_i_r[63:56]  )) ? vs1_i_r[63:56]   : vs2_i_r[63:56]);
+								probe[71:64]   = (($unsigned(vs1_i_r[71:64]  ) > $unsigned(vs2_i_r[71:64]  )) ? vs1_i_r[71:64]   : vs2_i_r[71:64]);
+								probe[79:72]   = (($unsigned(vs1_i_r[79:72]  ) > $unsigned(vs2_i_r[79:72]  )) ? vs1_i_r[79:72]   : vs2_i_r[79:72]);
+								probe[87:80]   = (($unsigned(vs1_i_r[87:80]  ) > $unsigned(vs2_i_r[87:80]  )) ? vs1_i_r[87:80]   : vs2_i_r[87:80]);
+								probe[95:88]   = (($unsigned(vs1_i_r[95:88]  ) > $unsigned(vs2_i_r[95:88]  )) ? vs1_i_r[95:88]   : vs2_i_r[95:88]);
+								probe[103:96]  = (($unsigned(vs1_i_r[103:96] ) > $unsigned(vs2_i_r[103:96] )) ? vs1_i_r[103:96]  : vs2_i_r[103:96]);
+								probe[111:104] = (($unsigned(vs1_i_r[111:104]) > $unsigned(vs2_i_r[111:104])) ? vs1_i_r[111:104] : vs2_i_r[111:104]);
+								probe[119:112] = (($unsigned(vs1_i_r[119:112]) > $unsigned(vs2_i_r[119:112])) ? vs1_i_r[119:112] : vs2_i_r[119:112]);
+								probe[127:120] = (($unsigned(vs1_i_r[127:120]) > $unsigned(vs2_i_r[127:120])) ? vs1_i_r[127:120] : vs2_i_r[127:120]);
+							end
+							3'b001:
+							begin
+								probe[15:0]    = (($unsigned(vs1_i_r[15:0]   ) > $unsigned(vs2_i_r[15:0]  ))  ? vs1_i_r[15:0]   : vs2_i_r[15:0]);
+								probe[31:16]   = (($unsigned(vs1_i_r[31:16]  ) > $unsigned(vs2_i_r[31:16] ))  ? vs1_i_r[31:16]  : vs2_i_r[31:16]);
+								probe[47:32]   = (($unsigned(vs1_i_r[47:32]  ) > $unsigned(vs2_i_r[47:32] ))  ? vs1_i_r[47:32]  : vs2_i_r[47:32]);
+								probe[63:48]   = (($unsigned(vs1_i_r[63:48]  ) > $unsigned(vs2_i_r[63:48] ))  ? vs1_i_r[63:48]  : vs2_i_r[63:48]);
+								probe[79:64]   = (($unsigned(vs1_i_r[79:64]  ) > $unsigned(vs2_i_r[79:64] ))  ? vs1_i_r[79:64]  : vs2_i_r[79:64]);
+								probe[95:80]   = (($unsigned(vs1_i_r[95:80]  ) > $unsigned(vs2_i_r[95:80] ))  ? vs1_i_r[95:80]  : vs2_i_r[95:80]);
+								probe[111:96]  = (($unsigned(vs1_i_r[111:96] ) > $unsigned(vs2_i_r[111:96]))  ? vs1_i_r[111:96] : vs2_i_r[111:96]);
+								probe[127:112] = (($unsigned(vs1_i_r[127:112]) > $unsigned(vs2_i_r[127:112])) ? vs1_i_r[127:112]: vs2_i_r[127:112]);
+							end
+							3'b010:
+							begin
+								probe[31:0]	   = (($unsigned(vs1_i_r[31:0]  ) > $unsigned(vs2_i_r[31:0]  )) ? vs1_i_r[31:0]   : vs2_i_r[31:0]);
+								probe[63:32]   = (($unsigned(vs1_i_r[63:32] ) > $unsigned(vs2_i_r[63:32] )) ? vs1_i_r[63:32]  : vs2_i_r[63:32]);
+								probe[95:64]   = (($unsigned(vs1_i_r[95:64] ) > $unsigned(vs2_i_r[95:64] )) ? vs1_i_r[95:64]  : vs2_i_r[95:64]);
+								probe[127:96]  = (($unsigned(vs1_i_r[127:96]) > $unsigned(vs2_i_r[127:96])) ? vs1_i_r[127:96] : vs2_i_r[127:96]);
+							end
+							3'b011:
+							begin
+								probe[63:0]    = (($unsigned(vs1_i_r[63:0] )  > $unsigned(vs2_i_r[63:0] ))  ? vs1_i_r[63:0]   : vs2_i_r[63:0]);
+								probe[127:64]  = (($unsigned(vs1_i_r[127:64]) > $unsigned(vs2_i_r[127:64])) ? vs1_i_r[127:64] : vs2_i_r[127:64]);
+							end
+							default:
+								probe = 'b0;
+						endcase
+					else
+						case(vsew_i_r)
+							3'b000:
+							begin
+								probe[7:0]     = (($unsigned(vs1_i_r[7:0]    ) < $unsigned(vs2_i_r[7:0]    )) ? vs1_i_r[7:0]     : vs2_i_r[7:0]);
+								probe[15:8]    = (($unsigned(vs1_i_r[15:8]   ) < $unsigned(vs2_i_r[15:8]   )) ? vs1_i_r[15:8]    : vs2_i_r[15:8]);
+								probe[23:16]   = (($unsigned(vs1_i_r[23:16]  ) < $unsigned(vs2_i_r[23:16]  )) ? vs1_i_r[23:16]   : vs2_i_r[23:16]);
+								probe[31:24]   = (($unsigned(vs1_i_r[31:24]  ) < $unsigned(vs2_i_r[31:24]  )) ? vs1_i_r[31:24]   : vs2_i_r[31:24]);
+								probe[39:32]   = (($unsigned(vs1_i_r[39:32]  ) < $unsigned(vs2_i_r[39:32]  )) ? vs1_i_r[39:32]   : vs2_i_r[39:32]);
+								probe[47:40]   = (($unsigned(vs1_i_r[47:40]  ) < $unsigned(vs2_i_r[47:40]  )) ? vs1_i_r[47:40]   : vs2_i_r[47:40]);
+								probe[55:48]   = (($unsigned(vs1_i_r[55:48]  ) < $unsigned(vs2_i_r[55:48]  )) ? vs1_i_r[55:48]   : vs2_i_r[55:48]);
+								probe[63:56]   = (($unsigned(vs1_i_r[63:56]  ) < $unsigned(vs2_i_r[63:56]  )) ? vs1_i_r[63:56]   : vs2_i_r[63:56]);
+								probe[71:64]   = (($unsigned(vs1_i_r[71:64]  ) < $unsigned(vs2_i_r[71:64]  )) ? vs1_i_r[71:64]   : vs2_i_r[71:64]);
+								probe[79:72]   = (($unsigned(vs1_i_r[79:72]  ) < $unsigned(vs2_i_r[79:72]  )) ? vs1_i_r[79:72]   : vs2_i_r[79:72]);
+								probe[87:80]   = (($unsigned(vs1_i_r[87:80]  ) < $unsigned(vs2_i_r[87:80]  )) ? vs1_i_r[87:80]   : vs2_i_r[87:80]);
+								probe[95:88]   = (($unsigned(vs1_i_r[95:88]  ) < $unsigned(vs2_i_r[95:88]  )) ? vs1_i_r[95:88]   : vs2_i_r[95:88]);
+								probe[103:96]  = (($unsigned(vs1_i_r[103:96] ) < $unsigned(vs2_i_r[103:96] )) ? vs1_i_r[103:96]  : vs2_i_r[103:96]);
+								probe[111:104] = (($unsigned(vs1_i_r[111:104]) < $unsigned(vs2_i_r[111:104])) ? vs1_i_r[111:104] : vs2_i_r[111:104]);
+								probe[119:112] = (($unsigned(vs1_i_r[119:112]) < $unsigned(vs2_i_r[119:112])) ? vs1_i_r[119:112] : vs2_i_r[119:112]);
+								probe[127:120] = (($unsigned(vs1_i_r[127:120]) < $unsigned(vs2_i_r[127:120])) ? vs1_i_r[127:120] : vs2_i_r[127:120]);
+							end
+							3'b001:
+							begin
+								probe[15:0]    = (($unsigned(vs1_i_r[15:0]   ) < $unsigned(vs2_i_r[15:0]  ))  ? vs1_i_r[15:0]   : vs2_i_r[15:0]);
+								probe[31:16]   = (($unsigned(vs1_i_r[31:16]  ) < $unsigned(vs2_i_r[31:16] ))  ? vs1_i_r[31:16]  : vs2_i_r[31:16]);
+								probe[47:32]   = (($unsigned(vs1_i_r[47:32]  ) < $unsigned(vs2_i_r[47:32] ))  ? vs1_i_r[47:32]  : vs2_i_r[47:32]);
+								probe[63:48]   = (($unsigned(vs1_i_r[63:48]  ) < $unsigned(vs2_i_r[63:48] ))  ? vs1_i_r[63:48]  : vs2_i_r[63:48]);
+								probe[79:64]   = (($unsigned(vs1_i_r[79:64]  ) < $unsigned(vs2_i_r[79:64] ))  ? vs1_i_r[79:64]  : vs2_i_r[79:64]);
+								probe[95:80]   = (($unsigned(vs1_i_r[95:80]  ) < $unsigned(vs2_i_r[95:80] ))  ? vs1_i_r[95:80]  : vs2_i_r[95:80]);
+								probe[111:96]  = (($unsigned(vs1_i_r[111:96] ) < $unsigned(vs2_i_r[111:96]))  ? vs1_i_r[111:96] : vs2_i_r[111:96]);
+								probe[127:112] = (($unsigned(vs1_i_r[127:112]) < $unsigned(vs2_i_r[127:112])) ? vs1_i_r[127:112]: vs2_i_r[127:112]);
+							end
+							3'b010:
+							begin
+								probe[31:0]	   = (($unsigned(vs1_i_r[31:0]  )  < $unsigned(vs2_i_r[31:0]  ))  ? vs1_i_r[31:0]   : vs2_i_r[31:0]);
+								probe[63:32]   = (($unsigned(vs1_i_r[63:32] )  < $unsigned(vs2_i_r[63:32] ))  ? vs1_i_r[63:32]  : vs2_i_r[63:32]);
+								probe[95:64]   = (($unsigned(vs1_i_r[95:64] )  < $unsigned(vs2_i_r[95:64] ))  ? vs1_i_r[95:64]  : vs2_i_r[95:64]);
+								probe[127:96]  = (($unsigned(vs1_i_r[127:96])  < $unsigned(vs2_i_r[127:96]))  ? vs1_i_r[127:96] : vs2_i_r[127:96]);
+							end
+							3'b011:
+							begin
+								probe[63:0]    = (($unsigned(vs1_i_r[63:0] )   < $unsigned(vs2_i_r[63:0] ))   ? vs1_i_r[63:0]   : vs2_i_r[63:0]);
+								probe[127:64]  = (($unsigned(vs1_i_r[127:64])  < $unsigned(vs2_i_r[127:64]))  ? vs1_i_r[127:64] : vs2_i_r[127:64]);
+							end
+							default:
+								probe = 'b0;
+						endcase
+			else
+				probe = 'b0;
+		end
+		
+	always
+	begin
+	#2
+		if(vd_o_r == probe)
+			begin
+			$display("OK");
+			x = 0;
+			end
+		else
+			begin
+			$display("ERROR");
+			x = 1;
+			end
+	end
+		
+	vector_maxmin_unit dut(
+	.chip_enable_i		(chip_enable_i_r),
+	.signed_unsigned_i	(signed_unsigned_i_r),
+	.maxmin_type_i		(maxmin_type_i_r),
+	.vsew_i				(vsew_i_r),
+	.vs1_i				(vs1_i_r),
+	.vs2_i				(vs2_i_r),
+	.vd_o				(vd_o_r)
+);
+endmodule

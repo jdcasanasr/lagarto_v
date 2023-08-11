@@ -1,0 +1,67 @@
+module vector_logic_unit_tb();
+
+reg				chip_enable_i_r;
+reg	[1:0]		logic_type_i_r;
+reg	[127:0]	vs1_i_r;
+reg	[127:0]	vs2_i_r;
+reg	[127:0]	prube;
+               
+wire	[127:0]	vd_o_r;
+
+initial
+	begin
+	#1
+		chip_enable_i_r	=	'b1;
+		logic_type_i_r		=	'b0;
+		vs1_i_r				=	'b0;
+		vs2_i_r				=	'b0;
+		prube					=	'b0;
+	end
+
+always
+	begin
+	#1
+		chip_enable_i_r	= {$random}	% 2;
+		logic_type_i_r		= {$random}	% 4;
+		vs1_i_r				= {$random,$random,$random,$random};
+		vs2_i_r				= {$random,$random,$random,$random};
+	end
+
+	
+always
+		begin
+		#1
+			if(chip_enable_i_r)
+				case(logic_type_i_r)
+					2'b01:
+							prube	<=		vs1_i_r	&	vs2_i_r;
+					2'b10:
+							prube	<=		vs1_i_r	|	vs2_i_r;
+					2'b11:
+							prube	<=		vs1_i_r	^	vs2_i_r;
+					default:
+							prube	<=		'b0;
+				endcase
+			else
+				prube <=	'b0; 
+		end
+
+always
+	begin
+		#1
+		if(vd_o_r == prube)
+			$display("OK");
+		else
+			$display("ERROR");
+	end
+	
+vector_logic_unit dut(
+	.chip_enable_i		(chip_enable_i_r),
+	.logic_type_i		(logic_type_i_r),
+	.vs1_i				(vs1_i_r),
+	.vs2_i				(vs2_i_r),
+	.vd_o 				(vd_o_r)
+);
+	
+		
+endmodule
